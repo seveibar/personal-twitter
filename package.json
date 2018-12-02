@@ -1,0 +1,20 @@
+{
+  "name": "@seveibar/personal-twitter",
+  "version": "1.0.0",
+  "description": "Personal twitter",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Severin Ibarluzea (seveibar@gmail.com)",
+  "devDependencies": {
+    "electron": "^3.0.7"
+  },
+  "dependencies": {
+    "electron-rebuild": "^1.8.2",
+    "moment": "^2.22.2",
+    "react": "alpha",
+    "react-dom": "alpha",
+    "sqlite3": "^4.0.4"
+  }
+}

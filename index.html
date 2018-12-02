@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Personal Twitter</title>
+  </head>
+  <body>
+    <div id="react"/>
+
+    <script>
+      const React = require("react");
+      const ReactDOM = require("react-dom");
+      const { ipcRenderer } = require("electron");
+      const moment = require("moment");
+
+      const { createElement, useState, useEffect, useRef } = React
+
+      const TweetTextArea = () => {
+        const [text, setText] = useState("")
+        const elm = useRef(null)
+        const onKeyDown = (e) => {
+          if (!e.shiftKey && e.key === "Enter") {
+            if (text.trim().length > 5) {
+              ipcRenderer.send("addTweet", text)
+              setTimeout(() => {
+                ipcRenderer.send("getTweets")
+              }, 100)
+              setText("")
+            }
+          }
+        }
+        useEffect(() => {
+          window.addEventListener("keydown", onKeyDown)
+          if (elm && elm.current) {
+            elm.current.focus()
+          }
+          return () => {
+            window.removeEventListener("keydown", onKeyDown)
+          }
+        })
+        return createElement("textarea", {
+          ref: elm,
+          value: text,
+          style: {
+            display: "flex",
+            width: "calc(100% - 44px)",
+            height: 100,
+            margin: 10,
+            padding: 10,
+            border: "1px solid #888",
+            fontSize: 18,
+            fontFamily: "sans-serif",
+            borderRadius: 4
+          },
+          onChange: (e) => {
+            if (e.target.value.trim() === "") return setText("")
+            setText(e.target.value)
+          }
+        }, null)
+      }
+
+      const App = () => {
+        const [tweets, setTweets] = useState(null);
+        useEffect(() => {
+          if (tweets !== null) return
+          ipcRenderer.on("tweets", (event, {tweets}) => {
+            setTweets(tweets)
+          })
+          setInterval(() => {
+            ipcRenderer.send("getTweets")
+          }, 2000)
+          ipcRenderer.send("getTweets")
+        })
+        return createElement("div", null,
+          createElement(TweetTextArea),
+          (tweets || []).map(tweet => (
+            createElement("div", {
+              key: tweet.id,
+              style: {
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: 4,
+                margin: 10,
+                padding: 10,
+                border: "1px solid #ccc"
+              }
+            },
+              createElement("div", {
+                style: {
+                  fontFamily: "sans-serif",
+                  whiteSpace: "pre-wrap"
+                }
+              }, tweet.content),
+              createElement("div", {
+                style: {
+                  fontFamily: "sans-serif",
+                  textAlign: "right",
+                  paddingTop: 8,
+                  color: "#888"
+                }
+              }, moment(tweet.created_at).fromNow())
+          )
+          ))
+        )
+      }
+
+      ReactDOM.render(createElement(App, null, null), document.getElementById("react"))
+    </script>
+
+  </body>
+</html>
