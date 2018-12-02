@@ -4,7 +4,8 @@
   "description": "Personal twitter",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "rebuild": "$(npm bin)/electron-rebuild"
   },
   "author": "Severin Ibarluzea (seveibar@gmail.com)",
   "devDependencies": {
