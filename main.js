@@ -2,7 +2,9 @@
 const { app, BrowserWindow, ipcMain } = require("electron")
 
 const sqlite3 = require("sqlite3").verbose()
-const db = new sqlite3.Database("/home/seve/.personal-twitter.db")
+const db = new sqlite3.Database(
+  `${require("os").homedir()}/.personal-twitter.db`
+)
 
 db.run(
   `
